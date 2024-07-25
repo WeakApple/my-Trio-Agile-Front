@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Unit
   layers:
   - Default
   - TransparentFX
@@ -13,12 +14,12 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - User
+  - Floor-1
+  - Floor-collider
+  - Floor-2
+  - Floor-2 - non
+  - Brige
   - 
   - 
   - 
@@ -40,4 +41,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Floor-0
+    uniqueID: 2119884415
+    locked: 0
+  - name: Floor-1
+    uniqueID: 3209200517
     locked: 0
