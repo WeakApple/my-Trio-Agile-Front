@@ -7,9 +7,9 @@ public class CameraController : MonoBehaviour
     Vector2 DragOrigin;
     bool IsDragging = false;
 
-    public float zoomSpeed = 10.0f;  // È®´ë/Ãà¼Ò ¼Óµµ
-    public float minZoom = 5.0f;    // ÃÖ¼Ò È®´ë ¼öÁØ
-    public float maxZoom = 30.0f;   // ÃÖ´ë Ãà¼Ò ¼öÁØ
+    public float zoomSpeed = 10.0f;  // í™•ëŒ€/ì¶•ì†Œ ì†ë„
+    public float minZoom = 5.0f;    // ìµœì†Œ í™•ëŒ€ ìˆ˜ì¤€
+    public float maxZoom = 30.0f;   // ìµœëŒ€ ì¶•ì†Œ ìˆ˜ì¤€
 
     void Start()
     {
@@ -21,7 +21,7 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        // Áöµµ È®´ë Ãà¼Ò ±â´É
+        // ì§€ë„ í™•ëŒ€ ì¶•ì†Œ ê¸°ëŠ¥
         float scrollData;
         scrollData = Input.GetAxis("Mouse ScrollWheel");
 
@@ -29,14 +29,14 @@ public class CameraController : MonoBehaviour
         Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minZoom, maxZoom);
 
 
-        // Ä«¸Ş¶ó ½ÃÁ¡À» µå·¡±×·Î ÀÌµ¿ ½ÃÅ´.
-        if (Input.GetMouseButtonDown(0))    // ¸¶¿ì½º Å¬¸¯½Ã
+        // ì¹´ë©”ë¼ ì‹œì ì„ ë“œë˜ê·¸ë¡œ ì´ë™ ì‹œí‚´.
+        if (Input.GetMouseButtonDown(0))    // ë§ˆìš°ìŠ¤ í´ë¦­ì‹œ
         {
             DragOrigin = Input.mousePosition;
             IsDragging = true;
         }
 
-        if (Input.GetMouseButtonUp(0))      // ¸¶¿ì½º ³õÀ» ½Ã
+        if (Input.GetMouseButtonUp(0))      // ë§ˆìš°ìŠ¤ ë†“ì„ ì‹œ
         {
             IsDragging = false;
         }
