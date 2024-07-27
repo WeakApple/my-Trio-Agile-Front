@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
                 if (hit.collider.CompareTag("Unit"))
                 {
                     GameObject selectedUnit = hit.collider.gameObject;
+                    selectedUnits.Add(selectedUnit);
                 }
             }
             else
