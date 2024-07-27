@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
                 if (hit.collider.CompareTag("Unit"))
                 {
                     GameObject selectedUnit = hit.collider.gameObject;
+                    selectedUnits.Add(selectedUnit);
                 }
             }
             else
@@ -74,7 +75,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("SwitchNavMeshSurface: surface is null");
             return;
         }
-        var units = FindObjectsOfType<UnitInterface>();
+        var units = FindObjectsOfType<IUnit>();
         foreach (var unit in units)
         {
             unit.SetNavMeshSurface(surface);
@@ -94,7 +95,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("SwitchSortingLayer: layerName & order is null");
             return;
         }
-        var units = FindObjectsOfType<UnitInterface>();
+        var units = FindObjectsOfType<IUnit>();
         foreach (var unit in units)
         {
             unit.SetSortingLayer(layerName, order);
@@ -124,16 +125,16 @@ public class GameManager : MonoBehaviour
 
 
     /// <summary>
-    /// 마우스 좌클릭 지점으로 유닛의 이동명령을 하는 함수.
+    /// 마우스 우클릭 지점으로 유닛의 이동명령을 하는 함수.
     /// </summary>
     void UnitMovement()
     {
-        if (Input.GetMouseButtonDown(1)) // 왼쪽 클릭
+        if (Input.GetMouseButtonDown(1)) // 오른쪽 클릭
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             foreach (GameObject unit in selectedUnits)
             {
-                unit.GetComponent<UnitInterface>().MoveTo(mousePosition);
+                unit.GetComponent<IUnit>().MoveTo(mousePosition);
             }
             ClearSelection();
         }
@@ -158,7 +159,7 @@ public class GameManager : MonoBehaviour
                         if (hit.collider != null && hit.collider.CompareTag("Resuorce"))
                         {
                             selelctedResource = hit.collider.gameObject;
-                            unit.GetComponent<UnitInterface>().getResource(selelctedResource);
+                            unit.GetComponent<IUnit>().getResource(selelctedResource);
                         }        
                     }
                 }

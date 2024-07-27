@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
 
-public class UnitInterface : MonoBehaviour
+public class IUnit : MonoBehaviour
 {
     //애니메이터를 지정하는 변수 ( getComponent로 대체 가능할지도?)
     public Animator animator;
@@ -79,7 +79,6 @@ public class UnitInterface : MonoBehaviour
         targetPosition = new Vector3(position.x, position.y, 0);
         nowState = STATE.MOVE;
         agent.SetDestination(targetPosition); // navMesh 목적지 설정.
-        Flip();
     }
 
     /// <summary>
