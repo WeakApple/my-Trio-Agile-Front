@@ -4,23 +4,23 @@ using UnityEngine;
 
 public class Resource : MonoBehaviour
 {
-    
+    // ì „ì²´ì ìœ¼ë¡œ ë¯¸êµ¬í˜„ëœ íŒŒì¼
     public enum RESOURCE_TYPE
     {
         GOLD, WOOD, MEAT
     }
 
-    public RESOURCE_TYPE resourceType = RESOURCE_TYPE.GOLD; // ÀÚ¿ø Á¾·ù
-    public int resourceAmount = 100; // ÀÚ¿ø ¾ç
+    public RESOURCE_TYPE resourceType = RESOURCE_TYPE.GOLD; // ìì› ì¢…ë¥˜
+    public int resourceAmount = 100; // ìì› ì–‘
 
-    // ÀÚ¿øÀÌ Ä³Á³À» ¶§ È£ÃâµÇ´Â ¸Ş¼­µå
+    // ìì›ì´ ìºì¡Œì„ ë•Œ í˜¸ì¶œë˜ëŠ” ë©”ì„œë“œ
     public int Gather(int amount)
     {
 
         resourceAmount -= amount;
         if (resourceAmount <= 0)
         {
-            this.gameObject.SetActive(false); // ÀÚ¿øÀÌ ´Ù Ä³Áö¸é ¿ÀºêÁ§Æ® ºñÈ°¼ºÈ­
+            this.gameObject.SetActive(false); // ìì›ì´ ë‹¤ ìºì§€ë©´ ì˜¤ë¸Œì íŠ¸ ë¹„í™œì„±í™”
             return resourceAmount;
         }
         return amount;
