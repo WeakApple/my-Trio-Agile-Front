@@ -6,14 +6,14 @@ using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
 
 public class GameManager : MonoBehaviour
 {
-    public LayerMask unitLayer; // À¯´ÖÀÌ ¼ÓÇÑ ·¹ÀÌ¾î
-    public LayerMask groundLayer; // ¶¥ÀÌ ¼ÓÇÑ ·¹ÀÌ¾î
-    public LayerMask resourceLayer; // ÀÚ¿øÀÌ ¼ÓÇÑ ·¹ÀÌ¾î
-    private List<GameObject> selectedUnits = new List<GameObject>(); //¼±ÅÃµÈ À¯´Ö
-    private GameObject selelctedResource; // ¼±ÅÃµÈ ÀÚ¿ø
+    public LayerMask unitLayer; // ìœ ë‹›ì´ ì†í•œ ë ˆì´ì–´
+    public LayerMask groundLayer; // ë•…ì´ ì†í•œ ë ˆì´ì–´
+    public LayerMask resourceLayer; // ìì›ì´ ì†í•œ ë ˆì´ì–´
+    private List<GameObject> selectedUnits = new List<GameObject>(); //ì„ íƒëœ ìœ ë‹›
+    private GameObject selelctedResource; // ì„ íƒëœ ìì›
 
-    public NavMeshSurface surface1; // 1Ãş navmesh surface
-    public NavMeshSurface surface2; // 2Ãş navmesh surface
+    public NavMeshSurface surface1; // 1ì¸µ navmesh surface
+    public NavMeshSurface surface2; // 2ì¸µ navmesh surface
 
     void Update()
     {
@@ -22,19 +22,19 @@ public class GameManager : MonoBehaviour
         UpdateNavMeshSurface();
     }
 
-    //À¯´Ö ¼±ÅÃ
+    //ìœ ë‹› ì„ íƒ
     void UnitSelection()
     {
-        if (Input.GetMouseButtonDown(0)) // ¿ŞÂÊ Å¬¸¯
+        if (Input.GetMouseButtonDown(0)) // ì™¼ìª½ í´ë¦­
         {
-            //¸¶¿ì½º À§Ä¡ Á¤º¸
+            //ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì •ë³´
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            //¸¶¿ì½º À§Ä¡ ÁËÇ¥¿¡¼­ raycast
+            //ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì£„í‘œì—ì„œ raycast
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, unitLayer);
             if (hit.collider != null)
             {
-                Debug.Log("Hit: " + hit.collider.name); // µğ¹ö±× ·Î±× 
-                // tag°¡ À¯´ÖÀÎ °Í¸¸
+                Debug.Log("Hit: " + hit.collider.name); // ë””ë²„ê·¸ ë¡œê·¸ 
+                // tagê°€ ìœ ë‹›ì¸ ê²ƒë§Œ
                 if (hit.collider.CompareTag("Unit"))
                 {
                     GameObject selectedUnit = hit.collider.gameObject;
@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //NavMesh surface¸¦ º¯°æÇÏ´Â ÇÔ¼ö
+    //NavMesh surfaceë¥¼ ë³€ê²½í•˜ëŠ” í•¨ìˆ˜
     void SwitchNavMeshSurface(NavMeshSurface surface)
     {
         if (surface == null)
@@ -56,14 +56,14 @@ public class GameManager : MonoBehaviour
             Debug.LogError("SwitchNavMeshSurface: surface is null");
             return;
         }
-        var units = FindObjectsOfType<UnitInterface>();
+        var units = FindObjectsOfType<IUnit>();
         foreach (var unit in units)
         {
             unit.SetNavMeshSurface(surface);
         }
     }
 
-    //·£´õ¸µÀ» À§ÇÑ À¯´ÖÀÇ ·¹ÀÌ¾î º¯°æ ÇÔ¼ö
+    //ëœë”ë§ì„ ìœ„í•œ ìœ ë‹›ì˜ ë ˆì´ì–´ ë³€ê²½ í•¨ìˆ˜
     void SwitchSortingLayer(string layerName, int order)
     {
         if (layerName == null)
@@ -71,14 +71,14 @@ public class GameManager : MonoBehaviour
             Debug.LogError("SwitchSortingLayer: layerName & order is null");
             return;
         }
-        var units = FindObjectsOfType<UnitInterface>();
+        var units = FindObjectsOfType<IUnit>();
         foreach (var unit in units)
         {
             unit.SetSortingLayer(layerName, order);
         }
     }
 
-    //¾î¶² ÀÌº¥Æ®¸¦ °¨ÁöÇßÀ» ¶§ Navmesh surface¸¦ ±³È¯ÇÒÁö¸¦ Á¤ÇÏ´Â ÇÔ¼ö. Á¶°Ç º¯°æÀ¸·Î À¯µ¿ÀûÀ¸·Î »ç¿ë.
+    //ì–´ë–¤ ì´ë²¤íŠ¸ë¥¼ ê°ì§€í–ˆì„ ë•Œ Navmesh surfaceë¥¼ êµí™˜í• ì§€ë¥¼ ì •í•˜ëŠ” í•¨ìˆ˜. ì¡°ê±´ ë³€ê²½ìœ¼ë¡œ ìœ ë™ì ìœ¼ë¡œ ì‚¬ìš©.
     void UpdateNavMeshSurface()
     {
         
@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //µå·¡±×¸¦ ÅëÇØÇÏ¿© ´Ù¼öÀÇ À¯´ÖÀ» ¼±ÅÃÇÏ´Â ÇÔ¼ö (¹Ì¿Ï¼º)
+    //ë“œë˜ê·¸ë¥¼ í†µí•´í•˜ì—¬ ë‹¤ìˆ˜ì˜ ìœ ë‹›ì„ ì„ íƒí•˜ëŠ” í•¨ìˆ˜ (ë¯¸ì™„ì„±)
     void ToggleUnitSelection(GameObject unit)
     {
         if (selectedUnits.Contains(unit))
@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour
     //    }
     //}
 
-    // ¼±ÅÃÇÑ À¯´ÖÀÇ ¼±ÅÃ ÇØÁ¦.
+    // ì„ íƒí•œ ìœ ë‹›ì˜ ì„ íƒ í•´ì œ.
     void ClearSelection()
     {
         foreach (GameObject unit in selectedUnits)
@@ -128,21 +128,21 @@ public class GameManager : MonoBehaviour
         selectedUnits.Clear();
     }
 
-    // À¯´Ö¿¡ ºÎÂøµÈ ½ºÅ©¸³Æ®·Î ÀÌµ¿¸í·ÉÀ» ºÎ¿©ÇÏ´Â ÇÔ¼ö.
+    // ìœ ë‹›ì— ë¶€ì°©ëœ ìŠ¤í¬ë¦½íŠ¸ë¡œ ì´ë™ëª…ë ¹ì„ ë¶€ì—¬í•˜ëŠ” í•¨ìˆ˜.
     void UnitMovement()
     {
-        if (Input.GetMouseButtonDown(1)) // ¿À¸¥ÂÊ Å¬¸¯
+        if (Input.GetMouseButtonDown(1)) // ì˜¤ë¥¸ìª½ í´ë¦­
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             foreach (GameObject unit in selectedUnits)
             {
-                unit.GetComponent<UnitInterface>().MoveTo(mousePosition);
+                unit.GetComponent<IUnit>().MoveTo(mousePosition, false);
             }
             ClearSelection();
         }
     }
 
-    //ÀÚ¿øÃ¤Áı ¸í·É (±¸Çö Áß)
+    //ìì›ì±„ì§‘ ëª…ë ¹ (êµ¬í˜„ ì¤‘)
     void orderResource()
     {
         if (selectedUnits != null && selectedUnits.Count > 0)
@@ -159,7 +159,7 @@ public class GameManager : MonoBehaviour
                         if (hit.collider != null && hit.collider.CompareTag("Resuorce"))
                         {
                             selelctedResource = hit.collider.gameObject;
-                            unit.GetComponent<UnitInterface>().getResource(selelctedResource);
+                            //unit.GetComponent<IUnit>().getResource(selelctedResource);
                         }        
                     }
                 }

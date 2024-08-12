@@ -15,12 +15,12 @@ TagManager:
   - 
   - 
   - User
+  - Floor-0
+  - Floor-0-n
   - Floor-1
-  - Floor-collider
-  - Floor-2
-  - Floor-2 - non
+  - Floor-1-n
   - Brige
-  - 
+  - MapColider
   - 
   - 
   - 
@@ -42,9 +42,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Floor-0
+  - name: Invisible
     uniqueID: 2119884415
     locked: 0
-  - name: Floor-1
+  - name: Floor-0
     uniqueID: 3209200517
+    locked: 0
+  - name: Floor-1
+    uniqueID: 445841735
     locked: 0
