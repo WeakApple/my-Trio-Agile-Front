@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using UnityEngine;
 using NavMeshSurface = NavMeshPlus.Components.NavMeshSurface;
+using Unity.Burst.CompilerServices;
 
 
 public class GameManager : MonoBehaviour
@@ -12,8 +13,8 @@ public class GameManager : MonoBehaviour
     private List<GameObject> selectedUnits = new List<GameObject>(); //선택된 유닛
     private GameObject selelctedResource; // 선택된 자원
 
-    public NavMeshSurface surface1; // 1층 navmesh surface
-    public NavMeshSurface surface2; // 2층 navmesh surface
+    public NavMeshSurface firstFloor; // 1층 navmesh surface
+    public NavMeshSurface secondFloor; // 2층 navmesh surface
 
     void Update()
     {
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
             //마우스 위치 정보
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             //마우스 위치 죄표에서 raycast
+            
             RaycastHit2D hit = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, unitLayer);
             if (hit.collider != null)
             {
@@ -84,12 +86,12 @@ public class GameManager : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            SwitchNavMeshSurface(surface1);
+            SwitchNavMeshSurface(firstFloor);
             SwitchSortingLayer("Floor-0", 3);
         }
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            SwitchNavMeshSurface(surface2);
+            SwitchNavMeshSurface(secondFloor);
             SwitchSortingLayer("Floor-1", 3);
         }
     }
@@ -134,11 +136,52 @@ public class GameManager : MonoBehaviour
         if (Input.GetMouseButtonDown(1)) // 오른쪽 클릭
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            foreach (GameObject unit in selectedUnits)
+
+            // 이동관련 로직 ( 수정 )
+            Debug.Log("Hit: " + "클릭 인식"); // 디버그 로그 
+            LayerMask firstFloorLayer = LayerMask.GetMask("Floor-0");
+            LayerMask secondFloorLayer = LayerMask.GetMask("Floor-1");
+
+            RaycastHit2D hitFirst = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, firstFloorLayer);
+            RaycastHit2D hitSecond = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, secondFloorLayer);
+            
+            if (hitFirst.collider != null)
             {
-                unit.GetComponent<IUnit>().MoveTo(mousePosition, false);
+
+                foreach (GameObject unit in selectedUnits)
+                {
+                    IUnit unitScript = unit.GetComponent<IUnit>();
+
+                    if (unitScript.isOnFirstFloor && hitSecond.collider != null)
+                    {
+                        if (hitSecond.collider.CompareTag("SecondFloor"))
+                        {
+                            Debug.Log("2층 클릭"); // 디버그 로그 
+                            unitScript.MoveToSecond(mousePosition);
+             
+                        }
+                       
+                    }
+                    else if (!unitScript.isOnFirstFloor && hitSecond.collider == null)
+                    {
+                        if (hitFirst.collider.CompareTag("FirstFloor"))
+                        {
+                            Debug.Log("1층 클릭"); // 디버그 로그
+                            unitScript.MoveToFirst(mousePosition);
+                        //        Transform closestStair = FindClosestStair(agent.transform.position, stairTilesSecondFloor);
+                        //        agent.SetDestination(closestStair.position);
+                        //        StartCoroutine(WaitForArrivalAndSwitchAgentType(closestStair.position, firstFloorSurface.agentTypeID, hit.point));
+                        }
+                        
+                    }
+                    else
+                    {
+                        Debug.Log("동일계층 이동"); // 디버그 로그 
+                        unitScript.MoveToSame(mousePosition);
+                    }
+                }
+                ClearSelection();
             }
-            ClearSelection();
         }
     }
 
