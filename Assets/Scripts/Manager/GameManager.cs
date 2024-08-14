@@ -20,10 +20,11 @@ public class GameManager : MonoBehaviour
     {
         UnitSelection();
         UnitMovement();
-        UpdateNavMeshSurface();
     }
 
-    //유닛 선택
+    /// <summary>
+    /// 유닛 선택 함수.
+    /// </summary>
     void UnitSelection()
     {
         if (Input.GetMouseButtonDown(0)) // 왼쪽 클릭
@@ -50,51 +51,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //NavMesh surface를 변경하는 함수
-    void SwitchNavMeshSurface(NavMeshSurface surface)
-    {
-        if (surface == null)
-        {
-            Debug.LogError("SwitchNavMeshSurface: surface is null");
-            return;
-        }
-        var units = FindObjectsOfType<IUnit>();
-        foreach (var unit in units)
-        {
-            unit.SetNavMeshSurface(surface);
-        }
-    }
 
-    //랜더링을 위한 유닛의 레이어 변경 함수
-    void SwitchSortingLayer(string layerName, int order)
-    {
-        if (layerName == null)
-        {
-            Debug.LogError("SwitchSortingLayer: layerName & order is null");
-            return;
-        }
-        var units = FindObjectsOfType<IUnit>();
-        foreach (var unit in units)
-        {
-            unit.SetSortingLayer(layerName, order);
-        }
-    }
 
-    //어떤 이벤트를 감지했을 때 Navmesh surface를 교환할지를 정하는 함수. 조건 변경으로 유동적으로 사용.
-    void UpdateNavMeshSurface()
-    {
-        
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SwitchNavMeshSurface(firstFloor);
-            SwitchSortingLayer("Floor-0", 3);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SwitchNavMeshSurface(secondFloor);
-            SwitchSortingLayer("Floor-1", 3);
-        }
-    }
 
     //드래그를 통해하여 다수의 유닛을 선택하는 함수 (미완성)
     void ToggleUnitSelection(GameObject unit)
@@ -120,7 +78,9 @@ public class GameManager : MonoBehaviour
     //    }
     //}
 
-    // 선택한 유닛의 선택 해제.
+    /// <summary>
+    /// 유닛 선택 해제 함수.
+    /// </summary>
     void ClearSelection()
     {
         foreach (GameObject unit in selectedUnits)
@@ -130,18 +90,22 @@ public class GameManager : MonoBehaviour
         selectedUnits.Clear();
     }
 
-    // 유닛에 부착된 스크립트로 이동명령을 부여하는 함수.
+    /// <summary>
+    /// 유닛 이동을 제어하는 함수.
+    /// </summary>
     void UnitMovement()
     {
         if (Input.GetMouseButtonDown(1)) // 오른쪽 클릭
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            // 이동관련 로직 ( 수정 )
-            Debug.Log("Hit: " + "클릭 인식"); // 디버그 로그 
+            // 이동관련 로직
+            
+            // 클릭한 지점이 1층인지 2층인지를 구분하기 위한 레이어 마스크.
             LayerMask firstFloorLayer = LayerMask.GetMask("Floor-0");
             LayerMask secondFloorLayer = LayerMask.GetMask("Floor-1");
 
+            // 1층 2층 클릭을 구분하기 위한 두개의 Raycast
             RaycastHit2D hitFirst = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, firstFloorLayer);
             RaycastHit2D hitSecond = Physics2D.Raycast(mousePosition, Vector2.zero, Mathf.Infinity, secondFloorLayer);
             
@@ -152,6 +116,7 @@ public class GameManager : MonoBehaviour
                 {
                     IUnit unitScript = unit.GetComponent<IUnit>();
 
+                    // 유닛이 1층에 위치하고 2층 클릭이 되었을 때.
                     if (unitScript.isOnFirstFloor && hitSecond.collider != null)
                     {
                         if (hitSecond.collider.CompareTag("SecondFloor"))
@@ -162,18 +127,17 @@ public class GameManager : MonoBehaviour
                         }
                        
                     }
+                    // 유닛이 2층에 위치하고 1층 클릭이 되었을 때.
                     else if (!unitScript.isOnFirstFloor && hitSecond.collider == null)
                     {
                         if (hitFirst.collider.CompareTag("FirstFloor"))
                         {
                             Debug.Log("1층 클릭"); // 디버그 로그
                             unitScript.MoveToFirst(mousePosition);
-                        //        Transform closestStair = FindClosestStair(agent.transform.position, stairTilesSecondFloor);
-                        //        agent.SetDestination(closestStair.position);
-                        //        StartCoroutine(WaitForArrivalAndSwitchAgentType(closestStair.position, firstFloorSurface.agentTypeID, hit.point));
                         }
                         
                     }
+                    // 동일한 계층의 위치가 클릭 되었을 때.
                     else
                     {
                         Debug.Log("동일계층 이동"); // 디버그 로그 
@@ -185,29 +149,4 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    //자원채집 명령 (구현 중)
-    void orderResource()
-    {
-        if (selectedUnits != null && selectedUnits.Count > 0)
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-
-                foreach (GameObject unit in selectedUnits)
-                {
-                    if (Physics.Raycast(ray, out hit, Mathf.Infinity, resourceLayer))
-                    {
-                        if (hit.collider != null && hit.collider.CompareTag("Resuorce"))
-                        {
-                            selelctedResource = hit.collider.gameObject;
-                            //unit.GetComponent<IUnit>().getResource(selelctedResource);
-                        }        
-                    }
-                }
-            }
-        }
-       
-    }
 }

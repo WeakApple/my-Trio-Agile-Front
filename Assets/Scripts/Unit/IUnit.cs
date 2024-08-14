@@ -76,6 +76,7 @@ public class IUnit : MonoBehaviour
                 {
                     //파라미터 Move의 값을 0으로 설정.
                     animator.SetFloat("Move", 0f);
+                    
                 }
                 break;
             default:
@@ -85,7 +86,7 @@ public class IUnit : MonoBehaviour
     }
 
     /// <summary>
-    /// 유닛을 이동시키는 함수.
+    /// 동일 계층에서 유닛을 이동시키는 함수.
     /// navmesh surface를 통해 이동.
     /// </summary>
     /// <param name="position">목적지의 vector3 좌표.</param>
@@ -99,34 +100,51 @@ public class IUnit : MonoBehaviour
     /// <summary>
     /// 2층에서 1층으로 이동할 때 사용되는 함수.
     /// </summary>
-    /// <param name="position"></param>
+    /// <param name="position"> 클릭된 목적지 </param>
     public void MoveToFirst(Vector3 position)
     {
+        // NavMesh Surface 정보를 가지고 있는 gameManager Object 참조.
         GameManager gameManageScript = gameManager.GetComponent<GameManager>();
+        // 캐시된 계단 타일의 좌표를 가지고 있는 gameManger Object 참조.
         MapManager mapManageScript = gameManager.GetComponent<MapManager>();
+
+        // z좌표를 고정.
         targetPosition = new Vector3(position.x, position.y, 0);
+        // 가장 가까운 계단 타일의 위치를 도출.
         Transform closestStair = FindClosestStair(agent.transform.position, mapManageScript.stairTilePositions);
+        // 계단까지 중간 목적지 설정
         agent.SetDestination(closestStair.position);
-        StartCoroutine(WaitForArrivalAndSwitchAgentType(closestStair.position, gameManageScript.firstFloor.agentTypeID, targetPosition));
+        // 계단도착 확인 후 NavMesh surface 변경 후 최종 목적지 이동.
+        StartCoroutine(WaitForArrival(closestStair.position, gameManageScript.firstFloor.agentTypeID, targetPosition));
     }
 
     /// <summary>
     /// 1층에서 2층으로 이동할 때 사용되는 함수
     /// </summary>
-    /// <param name="position"></param>
+    /// <param name="position"> 클릭된 목적지 </param>
     public void MoveToSecond(Vector3 position)
     {
+        // NavMesh Surface 정보를 가지고 있는 gameManager Object 참조.
         GameManager gameManageScript = gameManager.GetComponent<GameManager>();
+        // 캐시된 계단 타일의 좌표를 가지고 있는 gameManger Object 참조.
         MapManager mapManageScript = gameManager.GetComponent<MapManager>();
+
+        // z좌표를 고정.
         targetPosition = new Vector3(position.x, position.y, 0);
-       
+        // 가장 가까운 계단 타일의 위치를 도출.
         Transform closestStair = FindClosestStair(agent.transform.position, mapManageScript.stairTilePositions);
+        // 계단까지 중간 목적지 설정
         agent.SetDestination(closestStair.position);
-        Debug.Log("계단 이동");
-        StartCoroutine(WaitForArrivalAndSwitchAgentType(closestStair.position, gameManageScript.secondFloor.agentTypeID, targetPosition));
+        // 계단도착 확인 후 NavMesh surface 변경 후 최종 목적지 이동.
+        StartCoroutine(WaitForArrival(closestStair.position, gameManageScript.secondFloor.agentTypeID, targetPosition));
     }
 
-
+    /// <summary>
+    /// 유닛 위치를 기준으로 가장 가까운 계단 타일을 탐색하여 좌표를 반환하는 함수.
+    /// </summary>
+    /// <param name="currentPosition"> 유닛의 현 위치 </param>
+    /// <param name="stairs"> 캐시된 계단 타일의 좌표 리스트 </param>
+    /// <returns></returns>
     private Transform FindClosestStair(Vector3 currentPosition, List<Transform> stairs)
     {
         Transform closestStair = null;
@@ -148,29 +166,28 @@ public class IUnit : MonoBehaviour
 
 
     /// <summary>
-    /// 유닛이 중간 경유지에 도착할 때까지 딜레이를 주는 함수.
+    /// 유닛이 중간 경유지 도착 확인 및 처리를 위한 함수.
     /// </summary>
     /// <param name="stairPosition"></param>
     /// <param name="targetAgentTypeID"></param>
     /// <param name="finalDestination"></param>
     /// <returns></returns>
-    private IEnumerator WaitForArrivalAndSwitchAgentType(Vector3 stairPosition, int targetAgentTypeID, Vector3 finalDestination)
+    private IEnumerator WaitForArrival(Vector3 stairPosition, int targetAgentTypeID, Vector3 finalDestination)
     {
-        Debug.Log("계층 이동 시작");
         // 대략적인 도착 확인을 위해 일정 거리 내로 들어올 때까지 대기
         Vector2 destination = new Vector2(stairPosition.x, stairPosition.y);
-        Debug.Log("계단위치" + destination);
+
+        //Vector3 좌표로 거리 계산 시 z position으로 오차가 발생하기 때문에 Vector2로 변환하여 사용.
         while (Vector2.Distance(new Vector2(agent.transform.position.x, agent.transform.position.y), destination) > 0.3f)
         {
-            Vector2 agentPosition = new Vector2(agent.transform.position.x, agent.transform.position.y); // 매 루프마다 갱신
-            Debug.Log("코루틴: " + Vector2.Distance(agentPosition, destination));
-            Debug.Log("유닛 위치: " + agentPosition);
+            Vector2 agentPosition = new Vector2(agent.transform.position.x, agent.transform.position.y); // 매 루프마다 유닛 위치 갱신
             yield return null;
         }
-        Debug.Log("계층 이동 실제");
+
         // 에이전트의 agentTypeID 변경
         agent.agentTypeID = targetAgentTypeID;
 
+        // 1층 < - > 2층 사이 이동을 나타내는 flag 설정.
         isOnFirstFloor = !isOnFirstFloor;
 
         // 최종 목적지로 경로 설정
@@ -178,19 +195,9 @@ public class IUnit : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// 유닛이 동작하는 NavMeshSurface를 변경하는 함수.
-    /// </summary>
-    /// <param name="surface">변경대상 navmesh surface</param>
-    public void SetNavMeshSurface(NavMeshSurface surface)
-    {
-        if (agent != null && surface != null)
-        {
-            // 여기서는 agentTypeID를 사용하여 NavMeshSurface를 변경합니다.
-            agent.agentTypeID = surface.agentTypeID;
-        }
-    }
-    
+
+
+
     /// <summary>
     /// 랜더링 레이어 변경점을 유닛에 적용하는 함수.
     /// </summary>
@@ -220,15 +227,7 @@ public class IUnit : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 자원 재칩 함수 (미구현)
-    /// </summary>
-    /// <param name="selectedResource"></param>
-    //public void getResource(GameObject selectedResource)
-    //{
-    //    MoveTo(selectedResource.transform.position);
-    //    int holdAmount = selectedResource.GetComponent<Resource>().Gather(amount);
-    //}
+
 
 
 }
