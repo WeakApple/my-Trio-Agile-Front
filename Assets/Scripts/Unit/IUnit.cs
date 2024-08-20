@@ -72,7 +72,7 @@ public class IUnit : MonoBehaviour
             case STATE.MOVE:
                 //파라미터 Move의 값을 1000으로 설정.
                 animator.SetFloat("Move", 1000f);
-                if (!agent.pathPending && (agent.remainingDistance <= 0.1f))
+                if (!agent.pathPending && (agent.remainingDistance <= 1.1f))
                 {
                     //파라미터 Move의 값을 0으로 설정.
                     animator.SetFloat("Move", 0f);
