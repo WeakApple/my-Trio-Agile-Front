@@ -138,6 +138,41 @@ public class IUnit : MonoBehaviour
         // 계단도착 확인 후 NavMesh surface 변경 후 최종 목적지 이동.
         StartCoroutine(WaitForArrival(closestStair.position, gameManageScript.secondFloor.agentTypeID, targetPosition));
     }
+    /// <summary>
+    /// 2층 -> 1층 -> 2층 의 이동을 지원해주는 함수
+    /// </summary>
+    /// <param name="targetPosition"></param>
+    /// <param name="stairPositions"></param>
+    /// <param name="firstFloorAgentTypeID"></param>
+    public void MoveViaStairs(Vector3 position)
+    {
+        GameManager gameManageScript = gameManager.GetComponent<GameManager>();
+        MapManager mapManageScript = gameManager.GetComponent<MapManager>();
+
+        // z좌표를 고정.
+        targetPosition = new Vector3(position.x, position.y, 0);
+
+        // 1. 현재 위치에서 가장 가까운 계단으로 이동
+        Transform closestStair = FindClosestStair(agent.transform.position, mapManageScript.stairTilePositions);
+        agent.SetDestination(closestStair.position);
+
+        // 2. 계단을 통해 1층으로 이동한 후, 1층에서 새로운 2층으로 가기 위해 계단을 찾고 이동
+        StartCoroutine(MoveThroughStairs(closestStair.position, gameManageScript.firstFloor.agentTypeID, gameManageScript.secondFloor.agentTypeID, targetPosition, mapManageScript.stairTilePositions));
+    }
+
+    private IEnumerator MoveThroughStairs(Vector3 stairPosition, int firstFloorAgentTypeID, int secondFloorAgentTypeID, Vector3 finalDestination, List<Transform> stairPositions)
+    {
+        // 1. 첫 번째 계단 도착 대기 및 1층으로 이동
+        yield return StartCoroutine(WaitForArrival(stairPosition, firstFloorAgentTypeID, stairPosition));
+
+        // 2. 1층에서 새로운 2층의 계단으로 이동
+        Transform newStair = FindClosestStair(finalDestination, stairPositions);
+        agent.SetDestination(newStair.position);
+        yield return StartCoroutine(WaitForArrival(newStair.position, secondFloorAgentTypeID, finalDestination));
+
+        // 3. 최종 목적지로 이동
+        agent.SetDestination(finalDestination);
+    }
 
     /// <summary>
     /// 유닛 위치를 기준으로 가장 가까운 계단 타일을 탐색하여 좌표를 반환하는 함수.
@@ -178,7 +213,7 @@ public class IUnit : MonoBehaviour
         Vector2 destination = new Vector2(stairPosition.x, stairPosition.y);
 
         //Vector3 좌표로 거리 계산 시 z position으로 오차가 발생하기 때문에 Vector2로 변환하여 사용.
-        while (Vector2.Distance(new Vector2(agent.transform.position.x, agent.transform.position.y), destination) > 0.3f)
+        while (Vector2.Distance(new Vector2(agent.transform.position.x, agent.transform.position.y), destination) > 0.5f)
         {
             Vector2 agentPosition = new Vector2(agent.transform.position.x, agent.transform.position.y); // 매 루프마다 유닛 위치 갱신
             yield return null;

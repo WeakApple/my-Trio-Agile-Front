@@ -137,6 +137,27 @@ public class GameManager : MonoBehaviour
                         }
                         
                     }
+                    // 유닛이 2층에 있고, 2층의 먼 위치가 클릭되었을 때.
+                    else if (!unitScript.isOnFirstFloor && hitSecond.collider != null)
+                    {
+                        // 임계 거리 계산
+                        float distanceThreshold = 50.0f; // 200x200 타일맵에서 임의로 설정한 임계값
+                        float distanceToTarget = Vector3.Distance(unit.transform.position, mousePosition);
+
+                        // 동일 계층 이동 테스트
+                        Debug.Log("Distance to target: " + distanceToTarget);
+
+                        if (distanceToTarget <= distanceThreshold)
+                        {
+                            Debug.Log("동일계층 이동"); // 디버그 로그 
+                            unitScript.MoveToSame(mousePosition);
+                        }
+                        else
+                        {
+                            Debug.Log("다른 2층으로 이동"); // 디버그 로그
+                            unitScript.MoveViaStairs(mousePosition);
+                        }
+                    }
                     // 동일한 계층의 위치가 클릭 되었을 때.
                     else
                     {
